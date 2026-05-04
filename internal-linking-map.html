@@ -116,8 +116,8 @@
   <div id="panel-A" class="option-panel active">
     <div class="option-desc">
       <h3>Option A: Client-Facing Homepage</h3>
-      Homepage speaks to prospective clients. All advisor-facing content lives under <code>/advisors/*</code>. Client-facing content (services, directory, resources) lives at the root level. An on/off toggle in the nav lets advisors switch to their side of the site.
-      <div class="url-note">URL rule: advisor pages = /advisors/slug &nbsp;|&nbsp; client pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
+      Homepage speaks to prospective clients — the For Clients page <em>is</em> the homepage. The For Advisors page lives at <code>/advisors</code> as the advisor entry point. All advisor-facing content lives under <code>/advisors/*</code>. Client-facing content (services, directory, resources) lives at the root level. An on/off toggle in the nav lets advisors switch to their side of the site.
+      <div class="url-note">URL rule: / = client homepage &nbsp;|&nbsp; advisor pages = /advisors/slug &nbsp;|&nbsp; client pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--nav)"></div> Navigation</div>
@@ -146,8 +146,8 @@
   <div id="panel-B" class="option-panel">
     <div class="option-desc">
       <h3>Option B: Advisor-Facing Homepage</h3>
-      Homepage speaks to prospective advisors. All client-facing content lives under <code>/clients/*</code>. Advisor-facing content (why savvy, solutions, services, resources) lives at the root level. An on/off toggle in the nav lets clients switch to their side of the site.
-      <div class="url-note">URL rule: client pages = /clients/slug &nbsp;|&nbsp; advisor pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
+      Homepage speaks to prospective advisors — the For Advisors page <em>is</em> the homepage. The For Clients page lives at <code>/clients</code> as the client entry point. All client-facing content lives under <code>/clients/*</code>. Advisor-facing content (why savvy, solutions, services, resources) lives at the root level. An on/off toggle in the nav lets clients switch to their side of the site.
+      <div class="url-note">URL rule: / = advisor homepage &nbsp;|&nbsp; client pages = /clients/slug &nbsp;|&nbsp; advisor pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
     </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-dot" style="background:var(--nav)"></div> Navigation</div>
@@ -280,7 +280,16 @@ function clientPages(prefix) {
 
 function buildLinks(option) {
   const links = {};
+  // Remap merged pages: in Option A, cli-landing IS the homepage; in Option B, adv-landing IS the homepage
+  const remap = (id) => {
+    if (option === 'A' && id === 'cli-landing') return 'homepage';
+    if (option === 'B' && id === 'adv-landing') return 'homepage';
+    return id;
+  };
   const addLink = (from, to, type, reason) => {
+    from = remap(from);
+    to = remap(to);
+    if (from === to) return; // skip self-links created by remapping
     if (!links[from]) links[from] = [];
     // Avoid exact duplicates
     if (!links[from].find(l => l.to === to && l.type === type)) {
@@ -479,14 +488,23 @@ function buildLinks(option) {
       addLink(id, sib, 'ctx', 'Cross-link: other advisor types');
     });
   });
-  // Specific links
+  // Specific service links per ICP
   addLink('adv-breakaway', 'adv-svc-transition', 'ctx', 'Key concern: Transition Support');
   addLink('adv-breakaway', 'adv-svc-compliance', 'ctx', 'Key concern: Compliance setup');
   addLink('adv-solo', 'adv-svc-ops', 'ctx', 'Key concern: Operations support');
   addLink('adv-solo', 'adv-svc-marketing', 'ctx', 'Key concern: Growth without headcount');
+  addLink('adv-solo', 'adv-svc-intel', 'ctx', 'Key concern: AI tools to scale without headcount');
   addLink('adv-teams', 'adv-svc-client', 'ctx', 'Key concern: Client management at scale');
-  addLink('adv-affiliates', 'adv-vs-farther', 'ctx', 'Comparison: Savvy vs alternatives');
+  addLink('adv-teams', 'adv-svc-ops', 'ctx', 'Key concern: Operations at scale');
+  addLink('adv-affiliates', 'adv-svc-invest', 'ctx', 'Key concern: Investment flexibility');
+  // Comparison page links (contextual, not in nav)
+  addLink('adv-breakaway', 'adv-vs-lpl', 'ctx', 'Comparison: Savvy vs LPL');
+  addLink('adv-breakaway', 'adv-vs-mariner', 'ctx', 'Comparison: Savvy vs Mariner');
+  addLink('adv-solo', 'adv-vs-farther', 'ctx', 'Comparison: Savvy vs Farther');
+  addLink('adv-affiliates', 'adv-vs-farther', 'ctx', 'Comparison: Savvy vs Farther');
   addLink('adv-affiliates', 'adv-vs-lpl', 'ctx', 'Comparison: Savvy vs LPL');
+  addLink('adv-teams', 'adv-vs-mercer', 'ctx', 'Comparison: Savvy vs Mercer');
+  addLink('adv-teams', 'adv-vs-mariner', 'ctx', 'Comparison: Savvy vs Mariner');
 
   // Comparison pages
   ['adv-vs-farther','adv-vs-lpl','adv-vs-mariner','adv-vs-mercer'].forEach(id => {
@@ -519,14 +537,25 @@ function buildLinks(option) {
       addLink(id, sib, 'ctx', 'Related service');
     });
   });
-  // Specific cross-links
+  // Service → value prop links (reinforce the "why" behind each service)
   addLink('adv-svc-intel', 'adv-time', 'ctx', 'Value prop: saves time');
-  addLink('adv-svc-transition', 'adv-breakaway', 'ctx', 'For: advisors going independent');
+  addLink('adv-svc-intel', 'adv-people', 'ctx', 'Value prop: intelligent tools');
+  addLink('adv-svc-ops', 'adv-time', 'ctx', 'Value prop: more time for what matters');
   addLink('adv-svc-compliance', 'adv-trust', 'ctx', 'Value prop: trusted foundation');
-  addLink('adv-svc-marketing', 'adv-svc-client', 'ctx', 'Related: client management');
+  addLink('adv-svc-marketing', 'adv-svc-client', 'ctx', 'Related service: client management');
   addLink('adv-svc-invest', 'adv-ecosystem', 'ctx', 'Value prop: connected ecosystem');
   addLink('adv-svc-fin', 'adv-ecosystem', 'ctx', 'Value prop: connected ecosystem');
+  addLink('adv-svc-client', 'adv-trust', 'ctx', 'Value prop: trusted foundation for clients');
+  // Service → ICP links (who this service is especially relevant for)
+  addLink('adv-svc-transition', 'adv-breakaway', 'ctx', 'Especially for: advisors going independent');
+  addLink('adv-svc-transition', 'adv-affiliates', 'ctx', 'Especially for: advisors switching platforms');
+  addLink('adv-svc-ops', 'adv-solo', 'ctx', 'Especially for: solopreneurs');
+  addLink('adv-svc-marketing', 'adv-solo', 'ctx', 'Especially for: solopreneurs growing their practice');
+  addLink('adv-svc-client', 'adv-teams', 'ctx', 'Especially for: enterprise RIAs');
+  addLink('adv-svc-intel', 'adv-solo', 'ctx', 'Especially for: solopreneurs scaling with AI');
+  // Cross-audience link for services with client-facing equivalents
   addLink('adv-svc-fin', 'cli-svc-fin', 'ctx', 'Client-facing equivalent: Financial Planning');
+  addLink('adv-svc-invest', 'cli-svc-invest', 'ctx', 'Client-facing equivalent: Investment Management');
 
   // ── ADVISOR RESOURCES ──
   addLink('adv-resources', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
@@ -571,25 +600,28 @@ function buildLinks(option) {
     addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
     addLink(id, 'cli-landing', 'breadcrumb', 'Breadcrumb: For Clients');
     addLink(id, 'directory', 'cta', 'Primary CTA: "Find an advisor"');
+    addLink(id, 'adv-landing', 'cta', 'Advisor off-ramp CTA: "Are you a financial advisor?"');
     addLink(id, 'cli-services', 'ctx', '"See our full range of services"');
-    // Cross-link to related services
-    addLink(id, 'cli-svc-fin', 'ctx', 'Related: Financial Planning');
-    segmentIds.filter(s => s !== id).forEach(sib => {
-      addLink(id, sib, 'ctx', 'Cross-link: other client segments');
-    });
+    addLink(id, 'cli-svc-fin', 'ctx', 'Relevant service: Financial Planning');
   });
   // Specific segment → service links
-  addLink('cli-families', 'cli-svc-edu', 'ctx', 'Related: Education Planning');
-  addLink('cli-families', 'cli-svc-trust', 'ctx', 'Related: Trust & Estate');
-  addLink('cli-preretirees', 'cli-svc-retire', 'ctx', 'Related: Retirement Planning');
-  addLink('cli-preretirees', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
-  addLink('cli-seniors', 'cli-svc-invest', 'ctx', 'Related: Investment Management');
-  addLink('cli-seniors', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
-  addLink('cli-biz', 'cli-svc-biz', 'ctx', 'Related: Business Succession Planning');
-  addLink('cli-biz', 'cli-svc-401k', 'ctx', 'Related: 401(K) for Business');
-  addLink('cli-uhnw', 'cli-svc-alts', 'ctx', 'Related: Alternative Investments');
-  addLink('cli-uhnw', 'cli-svc-trust', 'ctx', 'Related: Trust & Estate');
-  addLink('cli-uhnw', 'cli-svc-direct', 'ctx', 'Related: Direct Indexing');
+  addLink('cli-families', 'cli-svc-edu', 'ctx', 'Relevant service: Education Planning');
+  addLink('cli-families', 'cli-svc-trust', 'ctx', 'Relevant service: Trust & Estate');
+  addLink('cli-preretirees', 'cli-svc-retire', 'ctx', 'Relevant service: Retirement Planning');
+  addLink('cli-preretirees', 'cli-svc-tax', 'ctx', 'Relevant service: Tax Optimization');
+  addLink('cli-seniors', 'cli-svc-invest', 'ctx', 'Relevant service: Investment Management');
+  addLink('cli-seniors', 'cli-svc-tax', 'ctx', 'Relevant service: Tax Optimization');
+  addLink('cli-biz', 'cli-svc-biz', 'ctx', 'Relevant service: Business Succession Planning');
+  addLink('cli-biz', 'cli-svc-401k', 'ctx', 'Relevant service: 401(K) for Business');
+  addLink('cli-uhnw', 'cli-svc-alts', 'ctx', 'Relevant service: Alternative Investments');
+  addLink('cli-uhnw', 'cli-svc-trust', 'ctx', 'Relevant service: Trust & Estate');
+  addLink('cli-uhnw', 'cli-svc-direct', 'ctx', 'Relevant service: Direct Indexing');
+  // Segment → related blog content
+  addLink('cli-families', 'cli-blog-post', 'ctx', 'Related blog: family financial planning articles');
+  addLink('cli-preretirees', 'cli-blog-post', 'ctx', 'Related blog: retirement & Social Security articles');
+  addLink('cli-seniors', 'cli-blog-post', 'ctx', 'Related blog: tax optimization & investment articles');
+  addLink('cli-biz', 'cli-blog-post', 'ctx', 'Related blog: business planning & succession articles');
+  addLink('cli-uhnw', 'cli-blog-post', 'ctx', 'Related blog: alternative investments & estate planning articles');
 
   // ── DIRECTORY ──
   addLink('directory', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
@@ -613,19 +645,48 @@ function buildLinks(option) {
   cliSvcIds.forEach(id => {
     addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
     addLink(id, 'cli-services', 'breadcrumb', 'Breadcrumb: Our Services');
-    addLink(id, 'directory', 'cta', 'CTA: "Find an advisor who specializes in this"');
-    // 2-3 related service cross-links
-    cliSvcIds.filter(s => s !== id).slice(0, 3).forEach(sib => {
-      addLink(id, sib, 'ctx', 'Related service');
-    });
+    addLink(id, 'directory', 'cta', 'Primary CTA: "Find an advisor who specializes in this"');
+    addLink(id, 'cli-services', 'cta', '"See all services"');
+    addLink(id, 'adv-landing', 'cta', 'Advisor off-ramp CTA: "Are you a financial advisor?"');
+    // Related blog content module (auto-pulls related posts)
+    addLink(id, 'cli-blog', 'ctx', 'Related content: blog posts on this topic');
   });
-  // Specific service cross-links
-  addLink('cli-svc-tax', 'cli-svc-direct', 'ctx', 'Related: Direct Indexing (tax-loss harvesting)');
-  addLink('cli-svc-retire', 'cli-svc-fin', 'ctx', 'Related: Financial Planning');
-  addLink('cli-svc-trust', 'cli-svc-risk', 'ctx', 'Related: Risk Management');
-  addLink('cli-svc-biz', 'cli-svc-401k', 'ctx', 'Related: 401(K) for Business');
-  addLink('cli-svc-pg', 'cli-svc-invest', 'ctx', 'Related: Investment Management');
-  addLink('cli-svc-pg', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
+  // "Who it's for" section — each service links to relevant client segments
+  addLink('cli-svc-invest', 'cli-seniors', 'ctx', 'Who it\'s for: Senior Professionals');
+  addLink('cli-svc-invest', 'cli-uhnw', 'ctx', 'Who it\'s for: UHNW');
+  addLink('cli-svc-tax', 'cli-preretirees', 'ctx', 'Who it\'s for: Pre-Retirees');
+  addLink('cli-svc-tax', 'cli-seniors', 'ctx', 'Who it\'s for: Senior Professionals');
+  addLink('cli-svc-tax', 'cli-biz', 'ctx', 'Who it\'s for: Business Owners');
+  addLink('cli-svc-direct', 'cli-uhnw', 'ctx', 'Who it\'s for: UHNW');
+  addLink('cli-svc-direct', 'cli-seniors', 'ctx', 'Who it\'s for: Senior Professionals');
+  addLink('cli-svc-retire', 'cli-preretirees', 'ctx', 'Who it\'s for: Pre-Retirees');
+  addLink('cli-svc-retire', 'cli-families', 'ctx', 'Who it\'s for: Families');
+  addLink('cli-svc-trust', 'cli-families', 'ctx', 'Who it\'s for: Families');
+  addLink('cli-svc-trust', 'cli-uhnw', 'ctx', 'Who it\'s for: UHNW');
+  addLink('cli-svc-risk', 'cli-families', 'ctx', 'Who it\'s for: Families');
+  addLink('cli-svc-risk', 'cli-biz', 'ctx', 'Who it\'s for: Business Owners');
+  addLink('cli-svc-biz', 'cli-biz', 'ctx', 'Who it\'s for: Business Owners');
+  addLink('cli-svc-edu', 'cli-families', 'ctx', 'Who it\'s for: Families');
+  addLink('cli-svc-fin', 'cli-preretirees', 'ctx', 'Who it\'s for: Pre-Retirees');
+  addLink('cli-svc-fin', 'cli-families', 'ctx', 'Who it\'s for: Families');
+  addLink('cli-svc-fin', 'cli-uhnw', 'ctx', 'Who it\'s for: UHNW');
+  addLink('cli-svc-alts', 'cli-uhnw', 'ctx', 'Who it\'s for: UHNW');
+  addLink('cli-svc-alts', 'cli-biz', 'ctx', 'Who it\'s for: Business Owners');
+  addLink('cli-svc-401k', 'cli-biz', 'ctx', 'Who it\'s for: Business Owners');
+  addLink('cli-svc-pg', 'cli-seniors', 'ctx', 'Who it\'s for: P&G Employees / Senior Professionals');
+  // Specific service → blog topic links
+  addLink('cli-svc-invest', 'cli-blog-post', 'ctx', 'Related blog: investment strategy articles');
+  addLink('cli-svc-tax', 'cli-blog-post', 'ctx', 'Related blog: tax optimization & tax-loss harvesting articles');
+  addLink('cli-svc-direct', 'cli-blog-post', 'ctx', 'Related blog: direct indexing explainers');
+  addLink('cli-svc-retire', 'cli-blog-post', 'ctx', 'Related blog: retirement planning & Social Security articles');
+  addLink('cli-svc-trust', 'cli-blog-post', 'ctx', 'Related blog: trust & estate articles (e.g., irrevocable trusts)');
+  addLink('cli-svc-risk', 'cli-blog-post', 'ctx', 'Related blog: risk management & insurance articles');
+  addLink('cli-svc-biz', 'cli-blog-post', 'ctx', 'Related blog: business succession & exit planning articles');
+  addLink('cli-svc-edu', 'cli-blog-post', 'ctx', 'Related blog: education planning & 529 articles');
+  addLink('cli-svc-fin', 'cli-blog-post', 'ctx', 'Related blog: financial planning & wealth management articles');
+  addLink('cli-svc-alts', 'cli-blog-post', 'ctx', 'Related blog: alternative investments & private markets articles');
+  addLink('cli-svc-401k', 'cli-blog-post', 'ctx', 'Related blog: 401(k) & employer retirement plan articles');
+  addLink('cli-svc-pg', 'cli-blog-post', 'ctx', 'Related blog: P&G stock options & employee benefits articles');
 
   // ── CLIENT RESOURCES ──
   addLink('cli-resources', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
@@ -693,15 +754,15 @@ function getAllPages(option) {
   let pages = [];
 
   if (option === 'A') {
-    // Client-facing homepage
+    // Client-facing homepage — For Clients IS the homepage, no separate /clients page
     pages.push({ id:'homepage', name:'Homepage (Client-Facing)', slug:'/', section:'Homepage', isChild:false });
-    pages = pages.concat(clientPages('')); // client at root
-    pages = pages.concat(advisorPages('')); // advisors at /advisors
+    pages = pages.concat(clientPages('').filter(p => p.id !== 'cli-landing'));
+    pages = pages.concat(advisorPages(''));
   } else {
-    // Advisor-facing homepage
+    // Advisor-facing homepage — For Advisors IS the homepage, no separate /advisors page
     pages.push({ id:'homepage', name:'Homepage (Advisor-Facing)', slug:'/', section:'Homepage', isChild:false });
-    pages = pages.concat(advisorPages('')); // advisors at /advisors (root-level hub)
-    pages = pages.concat(clientPages('/clients')); // clients at /clients
+    pages = pages.concat(advisorPages('').filter(p => p.id !== 'adv-landing'));
+    pages = pages.concat(clientPages('/clients'));
   }
   pages = pages.concat(sharedPages);
   return pages;
