@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savvy Wealth — Internal Linking Map</title>
+<style>
+  :root {
+    --nav: #4A90D9;
+    --ctx: #E67E22;
+    --cta: #27AE60;
+    --footer: #8E44AD;
+    --breadcrumb: #95A5A6;
+    --bg: #0F1419;
+    --surface: #1A2332;
+    --surface2: #243044;
+    --border: #2D3F56;
+    --text: #E8ECF1;
+    --text-dim: #8899AA;
+    --accent: #4A90D9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+
+  .header { padding: 32px 40px 0; max-width: 1400px; margin: 0 auto; }
+  .header h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+  .header p { color: var(--text-dim); font-size: 14px; margin-bottom: 20px; }
+
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); padding: 0 40px; max-width: 1400px; margin: 0 auto; }
+  .tab { padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--text-dim); border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .content { max-width: 1400px; margin: 0 auto; padding: 24px 40px 60px; }
+  .option-panel { display: none; }
+  .option-panel.active { display: block; }
+
+  .option-desc { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px 24px; margin-bottom: 24px; font-size: 14px; }
+  .option-desc h3 { font-size: 15px; margin-bottom: 8px; color: var(--accent); }
+  .option-desc .url-note { color: var(--text-dim); font-size: 13px; margin-top: 8px; font-style: italic; }
+
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; padding: 14px 20px; background: var(--surface); border-radius: 8px; border: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  .columns { display: grid; grid-template-columns: 300px 1fr; gap: 24px; min-height: 600px; }
+
+  .sitemap-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; overflow-y: auto; max-height: 80vh; position: sticky; top: 20px; }
+  .sitemap-panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 12px; }
+
+  .sitemap-section { margin-bottom: 16px; }
+  .sitemap-section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .sitemap-page { padding: 5px 8px; font-size: 13px; cursor: pointer; border-radius: 4px; transition: all 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sitemap-page:hover { background: var(--surface2); }
+  .sitemap-page.active { background: var(--accent); color: white; }
+  .sitemap-page.child { padding-left: 20px; font-size: 12px; color: var(--text-dim); }
+  .sitemap-page.child:hover { color: var(--text); }
+  .sitemap-page.child.active { color: white; }
+  .sitemap-page .slug { color: var(--text-dim); font-size: 11px; margin-left: 4px; }
+  .sitemap-page.active .slug { color: rgba(255,255,255,0.7); }
+
+  .detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+  .detail-panel h2 { font-size: 20px; margin-bottom: 4px; }
+  .detail-panel .detail-slug { color: var(--text-dim); font-size: 13px; margin-bottom: 16px; font-family: 'SF Mono', 'Fira Code', monospace; }
+
+  .detail-section { margin-bottom: 20px; }
+  .detail-section h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .detail-section h4 .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+  .link-list { list-style: none; }
+  .link-list li { padding: 6px 10px; font-size: 13px; border-radius: 4px; cursor: pointer; transition: background 0.15s; display: flex; justify-content: space-between; align-items: center; }
+  .link-list li:hover { background: var(--surface2); }
+  .link-list li .link-slug { color: var(--text-dim); font-size: 12px; font-family: 'SF Mono', 'Fira Code', monospace; }
+  .link-list li .link-reason { color: var(--text-dim); font-size: 11px; font-style: italic; }
+
+  .best-practices { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-top: 24px; }
+  .best-practices h3 { font-size: 16px; margin-bottom: 12px; }
+  .best-practices .bp-item { margin-bottom: 12px; font-size: 13px; padding-left: 16px; border-left: 2px solid var(--accent); }
+  .best-practices .bp-item strong { display: block; margin-bottom: 2px; }
+
+  .stats-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; flex: 1; min-width: 140px; }
+  .stat .stat-val { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .stat .stat-label { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+
+  .empty-state { text-align: center; padding: 80px 20px; color: var(--text-dim); }
+  .empty-state .arrow { font-size: 28px; margin-bottom: 12px; }
+
+  .search-box { width: 100%; padding: 8px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; margin-bottom: 12px; outline: none; }
+  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: var(--text-dim); }
+
+  .inbound-count { font-size: 11px; color: var(--text-dim); background: var(--surface2); padding: 1px 6px; border-radius: 8px; margin-left: 4px; }
+
+  @media (max-width: 900px) {
+    .columns { grid-template-columns: 1fr; }
+    .sitemap-panel { position: static; max-height: 300px; }
+    .header, .tabs, .content { padding-left: 16px; padding-right: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Savvy Wealth — Internal Linking Map</h1>
+  <p>Full link map: navigation, contextual, CTA, footer &amp; breadcrumb links for every page. Click any page on the left to see its outgoing links.</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('A')">Option A: Client-Facing Homepage</button>
+  <button class="tab" onclick="switchTab('B')">Option B: Advisor-Facing Homepage</button>
+</div>
+
+<div class="content">
+  <!-- Option A -->
+  <div id="panel-A" class="option-panel active">
+    <div class="option-desc">
+      <h3>Option A: Client-Facing Homepage</h3>
+      Homepage speaks to prospective clients. All advisor-facing content lives under <code>/advisors/*</code>. Client-facing content (services, directory, resources) lives at the root level. An on/off toggle in the nav lets advisors switch to their side of the site.
+      <div class="url-note">URL rule: advisor pages = /advisors/slug &nbsp;|&nbsp; client pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--nav)"></div> Navigation</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--ctx)"></div> Contextual (in-content)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--cta)"></div> CTA</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--footer)"></div> Footer</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--breadcrumb)"></div> Breadcrumb</div>
+    </div>
+    <div id="stats-A" class="stats-bar"></div>
+    <div class="columns">
+      <div class="sitemap-panel">
+        <h3>Sitemap</h3>
+        <input class="search-box" placeholder="Search pages..." oninput="filterPages('A', this.value)">
+        <div id="sitemap-A"></div>
+      </div>
+      <div id="detail-A" class="detail-panel">
+        <div class="empty-state">
+          <div class="arrow">←</div>
+          <div>Select a page from the sitemap to see its full link map</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div id="panel-B" class="option-panel">
+    <div class="option-desc">
+      <h3>Option B: Advisor-Facing Homepage</h3>
+      Homepage speaks to prospective advisors. All client-facing content lives under <code>/clients/*</code>. Advisor-facing content (why savvy, solutions, services, resources) lives at the root level. An on/off toggle in the nav lets clients switch to their side of the site.
+      <div class="url-note">URL rule: client pages = /clients/slug &nbsp;|&nbsp; advisor pages = root-level slugs &nbsp;|&nbsp; shared pages (about, legal) = root-level</div>
+    </div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--nav)"></div> Navigation</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--ctx)"></div> Contextual (in-content)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--cta)"></div> CTA</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--footer)"></div> Footer</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--breadcrumb)"></div> Breadcrumb</div>
+    </div>
+    <div id="stats-B" class="stats-bar"></div>
+    <div class="columns">
+      <div class="sitemap-panel">
+        <h3>Sitemap</h3>
+        <input class="search-box" placeholder="Search pages..." oninput="filterPages('B', this.value)">
+        <div id="sitemap-B"></div>
+      </div>
+      <div id="detail-B" class="detail-panel">
+        <div class="empty-state">
+          <div class="arrow">←</div>
+          <div>Select a page from the sitemap to see its full link map</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Best Practices -->
+  <div class="best-practices">
+    <h3>Internal Linking Best Practices Applied</h3>
+    <div class="bp-item"><strong>Topic clusters (hub &amp; spoke)</strong>Each pillar page (/advisors, /clients or equivalent, /services) acts as a hub linking down to all child pages. Children link back up to the hub and cross-link to siblings. This concentrates topical authority.</div>
+    <div class="bp-item"><strong>3-click depth maximum</strong>Every page is reachable within 3 clicks from the homepage. The deepest pages (e.g., individual service pages, comparison pages) are 3 levels deep at most.</div>
+    <div class="bp-item"><strong>Cross-audience bridging</strong>Both options include deliberate "off-ramp" links between the advisor and client sides — the homepage journey paths, the toggle, and contextual CTAs like "Are you an advisor?" / "Looking for a financial advisor?" ensure neither audience hits a dead end.</div>
+    <div class="bp-item"><strong>Contextual links at decision points</strong>Testimonials and advisor stories are linked from value prop pages, solution pages, and the homepage — placed where prospects need social proof to keep moving through the funnel.</div>
+    <div class="bp-item"><strong>CTA consistency</strong>Every page has a primary CTA (demo for advisors, find-an-advisor for clients) plus a secondary cross-audience CTA. No orphan pages without a next step.</div>
+    <div class="bp-item"><strong>Breadcrumb navigation</strong>Every child page includes breadcrumb links back to its parent and the homepage, reinforcing hierarchy for both users and search engines.</div>
+    <div class="bp-item"><strong>Footer link equity</strong>Footer links to key pages (About, Careers, FAQ, Terms, Privacy, both audience landing pages) provide sitewide link equity to pages that matter for trust and SEO.</div>
+    <div class="bp-item"><strong>Comparison pages (hidden from nav)</strong>The /advisors/savvy-vs-* pages are intentionally excluded from navigation but are contextually linked from relevant advisor pages — this keeps nav clean while supporting bottom-of-funnel SEO queries.</div>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────
+
+// Shared pages (identical slugs in both options)
+const sharedPages = [
+  { id:'about', name:'About', slug:'/about', section:'About', isChild:false },
+  { id:'our-story', name:'Our Story', slug:'/about/our-story', section:'About', isChild:true },
+  { id:'careers', name:'Careers', slug:'/about/careers', section:'About', isChild:true },
+  { id:'faq', name:'FAQ', slug:'/about/faq', section:'About', isChild:true },
+  { id:'terms', name:'Terms of Service', slug:'/terms-of-service', section:'Legal', isChild:false },
+  { id:'privacy', name:'Privacy Policy', slug:'/privacy-policy', section:'Legal', isChild:false },
+];
+
+// Advisor pages — slugs change between options
+function advisorPages(prefix) {
+  const p = prefix; // '/advisors' or ''
+  return [
+    { id:'adv-landing', name:'For Advisors', slug:p+'/advisors', section:'Advisors', isChild:false },
+    { id:'adv-independence', name:'Independence with Ownership', slug:p+'/advisors/independence', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-time', name:'More Time for What Matters', slug:p+'/advisors/time-savings', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-people', name:'World-Class People, Intelligent Tools', slug:p+'/advisors/people-and-tools', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-trust', name:'Trusted Foundation for Your Clients', slug:p+'/advisors/client-trust', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-community', name:'Community of Exceptional Advisors', slug:p+'/advisors/community', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-ecosystem', name:'Connected Financial Ecosystem', slug:p+'/advisors/financial-ecosystem', section:'Advisors → Why Savvy', isChild:true },
+    { id:'adv-solutions', name:'Who We Partner With', slug:p+'/advisors/solutions', section:'Advisors → Solutions', isChild:false },
+    { id:'adv-breakaway', name:'Breakaways', slug:p+'/advisors/solutions/breakaway', section:'Advisors → Solutions', isChild:true },
+    { id:'adv-solo', name:'Solopreneurs (RIA Owner-Operator)', slug:p+'/advisors/solutions/RIA-owner-operator', section:'Advisors → Solutions', isChild:true },
+    { id:'adv-teams', name:'Enterprise RIAs', slug:p+'/advisors/solutions/RIA-teams', section:'Advisors → Solutions', isChild:true },
+    { id:'adv-affiliates', name:'Independent Affiliates', slug:p+'/advisors/solutions/RIA-affiliates', section:'Advisors → Solutions', isChild:true },
+    { id:'adv-partners', name:'Recruiters & Consultants', slug:p+'/advisors/solutions/partners', section:'Advisors → Solutions', isChild:true },
+    { id:'adv-services', name:'Services (Overview)', slug:p+'/advisors/services', section:'Advisors → Services', isChild:false },
+    { id:'adv-svc-transition', name:'Transition Support', slug:p+'/advisors/services/transition-support', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-ops', name:'Operations', slug:p+'/advisors/services/operations', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-compliance', name:'Compliance', slug:p+'/advisors/services/compliance', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-marketing', name:'Marketing & Growth', slug:p+'/advisors/services/marketing', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-invest', name:'Investment Management (SWIM)', slug:p+'/advisors/services/investment-management', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-fin', name:'Financial Services', slug:p+'/advisors/services/savvy-financial-planning', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-client', name:'Client Management', slug:p+'/advisors/services/client-management', section:'Advisors → Services', isChild:true },
+    { id:'adv-svc-intel', name:'Savvy Intelligence', slug:p+'/advisors/services/savvy-intelligence', section:'Advisors → Services', isChild:true },
+    { id:'adv-resources', name:'Resources for Advisors', slug:p+'/advisors/resources', section:'Advisors → Resources', isChild:false },
+    { id:'adv-stories', name:'Advisor Stories', slug:p+'/advisors/resources/advisor-stories', section:'Advisors → Resources', isChild:true },
+    { id:'adv-press', name:'Press (Advisors)', slug:p+'/advisors/resources#press', section:'Advisors → Resources', isChild:true },
+    { id:'adv-announce', name:'Savvy Announcements', slug:p+'/advisors/resources#announcements', section:'Advisors → Resources', isChild:true },
+    { id:'adv-events', name:'Events (Advisors)', slug:p+'/advisors/resources#events', section:'Advisors → Resources', isChild:true },
+    { id:'adv-shipped', name:'Savvy Shipped', slug:p+'/advisors/resources#savvy-shipped', section:'Advisors → Resources', isChild:true },
+    { id:'demo', name:'Request a Demo', slug:'/demo', section:'Advisors → Conversion', isChild:false },
+    { id:'adv-vs-farther', name:'Savvy vs. Farther', slug:p+'/advisors/savvy-vs-farther', section:'Advisors → Comparisons (hidden)', isChild:true },
+    { id:'adv-vs-lpl', name:'Savvy vs. LPL', slug:p+'/advisors/savvy-vs-lpl', section:'Advisors → Comparisons (hidden)', isChild:true },
+    { id:'adv-vs-mariner', name:'Savvy vs. Mariner', slug:p+'/advisors/savvy-vs-mariner', section:'Advisors → Comparisons (hidden)', isChild:true },
+    { id:'adv-vs-mercer', name:'Savvy vs. Mercer', slug:p+'/advisors/savvy-vs-mercer', section:'Advisors → Comparisons (hidden)', isChild:true },
+  ];
+}
+
+// Client pages — slugs change between options
+function clientPages(prefix) {
+  const p = prefix; // '' or '/clients'
+  return [
+    { id:'cli-landing', name:'For Clients', slug: p ? p : '/clients', section:'Clients', isChild:false },
+    { id:'cli-families', name:'Families', slug:(p||'/clients')+'/families', section:'Clients → Segments', isChild:true },
+    { id:'cli-preretirees', name:'Pre-Retirees', slug:(p||'/clients')+'/pre-retirees', section:'Clients → Segments', isChild:true },
+    { id:'cli-seniors', name:'Senior Professionals', slug:(p||'/clients')+'/senior-professionals', section:'Clients → Segments', isChild:true },
+    { id:'cli-biz', name:'Business Owners', slug:(p||'/clients')+'/business-owners', section:'Clients → Segments', isChild:true },
+    { id:'cli-uhnw', name:'UHNW', slug:(p||'/clients')+'/uhnw', section:'Clients → Segments', isChild:true },
+    { id:'directory', name:'Find an Advisor', slug: p ? p+'/directory' : '/directory', section:'Clients → Directory', isChild:false },
+    { id:'advisor-page', name:'Advisor Profile Pages', slug: p ? p+'/directory/advisor-name' : '/directory/advisor-name', section:'Clients → Directory', isChild:true },
+    { id:'cli-services', name:'Our Services', slug: p ? p+'/services' : '/services', section:'Clients → Services', isChild:false },
+    { id:'cli-svc-invest', name:'Investment Management', slug:(p||'')+'/services/investment-management', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-tax', name:'Tax Optimization', slug:(p||'')+'/services/tax-optimization', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-direct', name:'Direct Indexing', slug:(p||'')+'/services/direct-indexing', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-retire', name:'Retirement Planning', slug:(p||'')+'/services/retirement-planning', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-trust', name:'Trust & Estate', slug:(p||'')+'/services/trust-and-estate', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-risk', name:'Risk Management', slug:(p||'')+'/services/risk-management', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-biz', name:'Business Succession Planning', slug:(p||'')+'/services/business-succession-planning', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-edu', name:'Education Planning', slug:(p||'')+'/services/education-planning', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-fin', name:'Financial Planning & Analysis', slug:(p||'')+'/services/financial-planning', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-alts', name:'Alternative Investments', slug:(p||'')+'/services/alternative-investments', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-401k', name:'401(K) for Business', slug:(p||'')+'/services/401k-plans', section:'Clients → Services', isChild:true },
+    { id:'cli-svc-pg', name:'P&G Employees', slug:(p||'')+'/services/proctor-and-gamble-employees', section:'Clients → Services', isChild:true },
+    { id:'cli-resources', name:'Resources for Clients', slug: p ? p+'/resources' : '/resources', section:'Clients → Resources', isChild:false },
+    { id:'cli-blog', name:'Blog', slug:(p||'')+'/resources/blog', section:'Clients → Resources', isChild:true },
+    { id:'cli-blog-post', name:'Blog Posts', slug:(p||'')+'/resources/blog/slug', section:'Clients → Resources', isChild:true },
+    { id:'cli-press', name:'Press (Clients)', slug:(p||'')+'/resources/press', section:'Clients → Resources', isChild:true },
+    { id:'cli-insights', name:'Insights', slug:(p||'')+'/resources#insights', section:'Clients → Resources', isChild:true },
+    { id:'cli-events', name:'Events (Clients)', slug:(p||'')+'/resources#events', section:'Clients → Resources', isChild:true },
+  ];
+}
+
+// ── LINK DEFINITIONS ───────────────────────────────────────────────
+
+// Link types: nav, ctx (contextual), cta, footer, breadcrumb
+// Each link: { to: pageId, type: 'nav'|'ctx'|'cta'|'footer'|'breadcrumb', reason: string }
+
+function buildLinks(option) {
+  const links = {};
+  const addLink = (from, to, type, reason) => {
+    if (!links[from]) links[from] = [];
+    // Avoid exact duplicates
+    if (!links[from].find(l => l.to === to && l.type === type)) {
+      links[from].push({ to, type, reason });
+    }
+  };
+
+  // ── FOOTER LINKS (sitewide — every page links to these) ──
+  const footerTargets = [
+    { id: option === 'A' ? 'homepage' : 'adv-landing', reason: 'Footer: For Advisors' },
+    { id: option === 'A' ? 'cli-landing' : 'homepage', reason: 'Footer: For Clients' },
+    { id: 'about', reason: 'Footer: About' },
+    { id: 'our-story', reason: 'Footer: Our Story' },
+    { id: 'careers', reason: 'Footer: Careers' },
+    { id: 'faq', reason: 'Footer: FAQ' },
+    { id: 'directory', reason: 'Footer: Find an Advisor' },
+    { id: 'demo', reason: 'Footer: Request a Demo' },
+    { id: 'cli-resources', reason: 'Footer: Resources' },
+    { id: 'terms', reason: 'Footer: Terms' },
+    { id: 'privacy', reason: 'Footer: Privacy' },
+  ];
+
+  // Get all page IDs
+  const allIds = getAllPages(option).map(p => p.id);
+
+  allIds.forEach(pid => {
+    footerTargets.forEach(ft => {
+      if (ft.id !== pid && allIds.includes(ft.id)) addLink(pid, ft.id, 'footer', ft.reason);
+    });
+  });
+
+  // ── HOMEPAGE ──
+  if (option === 'A') {
+    // Client-facing homepage
+    addLink('homepage', 'adv-landing', 'cta', 'Journey path: "Partner with us →"');
+    addLink('homepage', 'directory', 'cta', 'Journey path: "Find a financial advisor →"');
+    addLink('homepage', 'our-story', 'ctx', '"Started by someone on your side of the table" section');
+    addLink('homepage', 'cli-families', 'ctx', 'Who we work with: Families');
+    addLink('homepage', 'cli-preretirees', 'ctx', 'Who we work with: Pre-Retirees');
+    addLink('homepage', 'cli-seniors', 'ctx', 'Who we work with: Senior Professionals');
+    addLink('homepage', 'cli-biz', 'ctx', 'Who we work with: Business Owners');
+    addLink('homepage', 'cli-uhnw', 'ctx', 'Who we work with: UHNW');
+    addLink('homepage', 'cli-svc-tax', 'ctx', 'Services highlight: Tax Optimization');
+    addLink('homepage', 'cli-svc-fin', 'ctx', 'Services highlight: Financial Planning');
+    addLink('homepage', 'cli-svc-alts', 'ctx', 'Services highlight: Alternative Investments');
+    addLink('homepage', 'cli-services', 'cta', '"Explore all services →"');
+    addLink('homepage', 'about', 'ctx', 'Why Savvy: credibility stats section');
+
+    // Nav links (client nav — Option B from doc 2)
+    addLink('homepage', 'cli-landing', 'nav', 'Nav: Who we serve ▾ (parent)');
+    addLink('homepage', 'cli-families', 'nav', 'Nav: Who we serve → Families');
+    addLink('homepage', 'cli-preretirees', 'nav', 'Nav: Who we serve → Pre-Retirees');
+    addLink('homepage', 'cli-seniors', 'nav', 'Nav: Who we serve → Senior Professionals');
+    addLink('homepage', 'cli-biz', 'nav', 'Nav: Who we serve → Business Owners');
+    addLink('homepage', 'cli-uhnw', 'nav', 'Nav: Who we serve → UHNW');
+    addLink('homepage', 'directory', 'nav', 'Nav: Find an Advisor');
+    addLink('homepage', 'cli-services', 'nav', 'Nav: Our Services ▾ (parent)');
+    ['cli-svc-invest','cli-svc-tax','cli-svc-direct','cli-svc-retire','cli-svc-trust','cli-svc-risk','cli-svc-biz','cli-svc-edu','cli-svc-fin','cli-svc-alts','cli-svc-401k','cli-svc-pg'].forEach(s => {
+      addLink('homepage', s, 'nav', 'Nav: Our Services dropdown');
+    });
+    addLink('homepage', 'cli-resources', 'nav', 'Nav: Resources ▾ (parent)');
+    addLink('homepage', 'cli-press', 'nav', 'Nav: Resources → Press');
+    addLink('homepage', 'cli-blog', 'nav', 'Nav: Resources → Blog');
+    addLink('homepage', 'cli-insights', 'nav', 'Nav: Resources → Insights');
+    addLink('homepage', 'cli-events', 'nav', 'Nav: Resources → Events');
+    addLink('homepage', 'about', 'nav', 'Nav: About ▾');
+    addLink('homepage', 'our-story', 'nav', 'Nav: About → Our Story');
+    addLink('homepage', 'careers', 'nav', 'Nav: About → Careers');
+
+  } else {
+    // Advisor-facing homepage
+    addLink('homepage', 'cli-landing', 'cta', 'Journey path: "Find a financial advisor →"');
+    addLink('homepage', 'directory', 'cta', 'Journey path: "Find a financial advisor →"');
+    addLink('homepage', 'demo', 'cta', 'Hero CTA: "See if you\'re a fit"');
+    addLink('homepage', 'adv-solutions', 'ctx', '"Who we partner with" section');
+    addLink('homepage', 'adv-breakaway', 'ctx', 'ICP card: Breakaways');
+    addLink('homepage', 'adv-solo', 'ctx', 'ICP card: Solopreneurs');
+    addLink('homepage', 'adv-teams', 'ctx', 'ICP card: Enterprise RIAs');
+    addLink('homepage', 'adv-affiliates', 'ctx', 'ICP card: Independent Affiliates');
+    addLink('homepage', 'adv-independence', 'ctx', 'Value prop: Independence with Ownership → Learn more');
+    addLink('homepage', 'adv-time', 'ctx', 'Value prop: More Time → Learn more');
+    addLink('homepage', 'adv-people', 'ctx', 'Value prop: People & Tools → Learn more');
+    addLink('homepage', 'adv-trust', 'ctx', 'Value prop: Trusted Foundation → Learn more');
+    addLink('homepage', 'adv-community', 'ctx', 'Value prop: Community → Learn more');
+    addLink('homepage', 'adv-ecosystem', 'ctx', 'Value prop: Ecosystem → Learn more');
+    addLink('homepage', 'adv-svc-intel', 'ctx', 'Services grid: Savvy Intelligence');
+    addLink('homepage', 'adv-svc-transition', 'ctx', 'Services grid: Transition Support');
+    addLink('homepage', 'adv-svc-ops', 'ctx', 'Services grid: Operations');
+    addLink('homepage', 'adv-svc-compliance', 'ctx', 'Services grid: Compliance');
+    addLink('homepage', 'adv-svc-marketing', 'ctx', 'Services grid: Marketing & Growth');
+    addLink('homepage', 'adv-svc-invest', 'ctx', 'Services grid: Investment Management');
+    addLink('homepage', 'adv-svc-fin', 'ctx', 'Services grid: Financial Services');
+    addLink('homepage', 'adv-svc-client', 'ctx', 'Services grid: Client Management');
+    addLink('homepage', 'adv-services', 'cta', '"Explore our services →"');
+    addLink('homepage', 'adv-stories', 'ctx', 'Advisor stories carousel');
+
+    // Nav links (advisor nav — Option A from doc 2)
+    addLink('homepage', 'adv-solutions', 'nav', 'Nav: Who we partner with ▾');
+    addLink('homepage', 'adv-breakaway', 'nav', 'Nav: Who we partner with → Breakaway');
+    addLink('homepage', 'adv-solo', 'nav', 'Nav: Who we partner with → Solopreneurs');
+    addLink('homepage', 'adv-teams', 'nav', 'Nav: Who we partner with → Enterprise RIAs');
+    addLink('homepage', 'adv-affiliates', 'nav', 'Nav: Who we partner with → Independent Affiliates');
+    addLink('homepage', 'adv-independence', 'nav', 'Nav: Why Savvy → Independence');
+    addLink('homepage', 'adv-time', 'nav', 'Nav: Why Savvy → Time');
+    addLink('homepage', 'adv-people', 'nav', 'Nav: Why Savvy → People & Tools');
+    addLink('homepage', 'adv-trust', 'nav', 'Nav: Why Savvy → Trusted Foundation');
+    addLink('homepage', 'adv-community', 'nav', 'Nav: Why Savvy → Community');
+    addLink('homepage', 'adv-ecosystem', 'nav', 'Nav: Why Savvy → Ecosystem');
+    addLink('homepage', 'adv-services', 'nav', 'Nav: Services ▾');
+    ['adv-svc-transition','adv-svc-ops','adv-svc-compliance','adv-svc-marketing','adv-svc-invest','adv-svc-fin','adv-svc-client','adv-svc-intel'].forEach(s => {
+      addLink('homepage', s, 'nav', 'Nav: Services dropdown');
+    });
+    addLink('homepage', 'adv-resources', 'nav', 'Nav: Resources ▾');
+    addLink('homepage', 'adv-stories', 'nav', 'Nav: Resources → Advisor Stories');
+    addLink('homepage', 'adv-press', 'nav', 'Nav: Resources → Press');
+    addLink('homepage', 'adv-announce', 'nav', 'Nav: Resources → Announcements');
+    addLink('homepage', 'about', 'nav', 'Nav: About');
+    addLink('homepage', 'our-story', 'nav', 'Nav: About (linked in dropdown/section)');
+    addLink('homepage', 'careers', 'nav', 'Nav: About → Careers');
+  }
+
+  // ── FOR ADVISORS LANDING ──
+  addLink('adv-landing', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('adv-landing', 'demo', 'cta', 'Primary CTA: "See if you\'re a fit"');
+  addLink('adv-landing', 'directory', 'cta', 'Secondary CTA: "Looking for a financial advisor?"');
+  addLink('adv-landing', 'adv-independence', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-time', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-people', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-trust', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-community', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-ecosystem', 'ctx', 'Value prop → Learn more');
+  addLink('adv-landing', 'adv-solutions', 'ctx', '"Who we partner with" section');
+  addLink('adv-landing', 'adv-breakaway', 'ctx', 'ICP card: Breakaways');
+  addLink('adv-landing', 'adv-solo', 'ctx', 'ICP card: Solopreneurs');
+  addLink('adv-landing', 'adv-teams', 'ctx', 'ICP card: Enterprise RIAs');
+  addLink('adv-landing', 'adv-affiliates', 'ctx', 'ICP card: Independent Affiliates');
+  addLink('adv-landing', 'adv-services', 'cta', '"Explore our services →"');
+  addLink('adv-landing', 'adv-svc-intel', 'ctx', 'Services grid: Savvy Intelligence');
+  addLink('adv-landing', 'adv-svc-transition', 'ctx', 'Services grid: Transition Support');
+  addLink('adv-landing', 'adv-svc-ops', 'ctx', 'Services grid: Operations');
+  addLink('adv-landing', 'adv-svc-compliance', 'ctx', 'Services grid: Compliance');
+  addLink('adv-landing', 'adv-svc-marketing', 'ctx', 'Services grid: Marketing & Growth');
+  addLink('adv-landing', 'adv-svc-invest', 'ctx', 'Services grid: Investment Management');
+  addLink('adv-landing', 'adv-svc-fin', 'ctx', 'Services grid: Financial Services');
+  addLink('adv-landing', 'adv-svc-client', 'ctx', 'Services grid: Client Management');
+  addLink('adv-landing', 'adv-stories', 'ctx', 'Advisor stories / testimonials carousel');
+
+  // ── WHY SAVVY PAGES (6 value prop pages) ──
+  const whySavvyIds = ['adv-independence','adv-time','adv-people','adv-trust','adv-community','adv-ecosystem'];
+  whySavvyIds.forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+    addLink(id, 'demo', 'cta', 'Primary CTA: "See if you\'re a fit"');
+    addLink(id, 'adv-stories', 'ctx', 'Related advisor testimonial / story');
+    addLink(id, 'adv-services', 'ctx', '"See what we offer" contextual link');
+    // Cross-link to sibling value props
+    whySavvyIds.filter(s => s !== id).forEach(sib => {
+      addLink(id, sib, 'ctx', 'Cross-link: related value prop');
+    });
+  });
+  // Specific contextual links per value prop
+  addLink('adv-independence', 'adv-solutions', 'ctx', '"See who we partner with"');
+  addLink('adv-time', 'adv-svc-ops', 'ctx', 'Related: Operations service');
+  addLink('adv-time', 'adv-svc-intel', 'ctx', 'Related: Savvy Intelligence');
+  addLink('adv-people', 'adv-svc-transition', 'ctx', 'Related: Transition Support team');
+  addLink('adv-people', 'adv-svc-intel', 'ctx', 'Related: AI-powered tools');
+  addLink('adv-trust', 'adv-svc-compliance', 'ctx', 'Related: Compliance');
+  addLink('adv-trust', 'adv-svc-client', 'ctx', 'Related: Client Management');
+  addLink('adv-trust', 'cli-landing', 'ctx', '"See the client experience"');
+  addLink('adv-community', 'adv-stories', 'ctx', 'Advisor community stories');
+  addLink('adv-ecosystem', 'adv-svc-fin', 'ctx', 'Related: Financial Services');
+  addLink('adv-ecosystem', 'adv-svc-invest', 'ctx', 'Related: Investment Management');
+
+  // ── SOLUTIONS PAGES ──
+  addLink('adv-solutions', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('adv-solutions', 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+  addLink('adv-solutions', 'demo', 'cta', 'Primary CTA');
+  addLink('adv-solutions', 'adv-breakaway', 'ctx', 'Solution card: Breakaways');
+  addLink('adv-solutions', 'adv-solo', 'ctx', 'Solution card: Solopreneurs');
+  addLink('adv-solutions', 'adv-teams', 'ctx', 'Solution card: Enterprise');
+  addLink('adv-solutions', 'adv-affiliates', 'ctx', 'Solution card: Affiliates');
+  addLink('adv-solutions', 'adv-partners', 'ctx', 'Solution card: Recruiters & Consultants');
+  addLink('adv-solutions', 'adv-services', 'ctx', 'Cross-link to services overview');
+
+  const solutionIds = ['adv-breakaway','adv-solo','adv-teams','adv-affiliates','adv-partners'];
+  solutionIds.forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+    addLink(id, 'adv-solutions', 'breadcrumb', 'Breadcrumb: Who We Partner With');
+    addLink(id, 'demo', 'cta', 'Primary CTA: Request a demo');
+    addLink(id, 'adv-stories', 'ctx', 'Related advisor story');
+    addLink(id, 'adv-services', 'ctx', '"See our full service offering"');
+    addLink(id, 'adv-independence', 'ctx', 'Value prop: Independence with Ownership');
+    // Cross-link to siblings
+    solutionIds.filter(s => s !== id).forEach(sib => {
+      addLink(id, sib, 'ctx', 'Cross-link: other advisor types');
+    });
+  });
+  // Specific links
+  addLink('adv-breakaway', 'adv-svc-transition', 'ctx', 'Key concern: Transition Support');
+  addLink('adv-breakaway', 'adv-svc-compliance', 'ctx', 'Key concern: Compliance setup');
+  addLink('adv-solo', 'adv-svc-ops', 'ctx', 'Key concern: Operations support');
+  addLink('adv-solo', 'adv-svc-marketing', 'ctx', 'Key concern: Growth without headcount');
+  addLink('adv-teams', 'adv-svc-client', 'ctx', 'Key concern: Client management at scale');
+  addLink('adv-affiliates', 'adv-vs-farther', 'ctx', 'Comparison: Savvy vs alternatives');
+  addLink('adv-affiliates', 'adv-vs-lpl', 'ctx', 'Comparison: Savvy vs LPL');
+
+  // Comparison pages
+  ['adv-vs-farther','adv-vs-lpl','adv-vs-mariner','adv-vs-mercer'].forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+    addLink(id, 'demo', 'cta', 'Primary CTA: Request a demo');
+    addLink(id, 'adv-independence', 'ctx', 'Key differentiator: Independence');
+    addLink(id, 'adv-services', 'ctx', '"See our full platform"');
+    addLink(id, 'adv-stories', 'ctx', 'Social proof: advisor testimonials');
+    addLink(id, 'adv-solutions', 'ctx', '"See who we partner with"');
+  });
+
+  // ── ADVISOR SERVICES ──
+  addLink('adv-services', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('adv-services', 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+  addLink('adv-services', 'demo', 'cta', 'Primary CTA');
+  const advSvcIds = ['adv-svc-transition','adv-svc-ops','adv-svc-compliance','adv-svc-marketing','adv-svc-invest','adv-svc-fin','adv-svc-client','adv-svc-intel'];
+  advSvcIds.forEach(id => {
+    addLink('adv-services', id, 'ctx', 'Service card link');
+  });
+
+  advSvcIds.forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+    addLink(id, 'adv-services', 'breadcrumb', 'Breadcrumb: Services');
+    addLink(id, 'demo', 'cta', 'Primary CTA: Request a demo');
+    addLink(id, 'adv-stories', 'ctx', 'Related advisor story / testimonial');
+    // Cross-link to 2-3 related services
+    advSvcIds.filter(s => s !== id).slice(0, 3).forEach(sib => {
+      addLink(id, sib, 'ctx', 'Related service');
+    });
+  });
+  // Specific cross-links
+  addLink('adv-svc-intel', 'adv-time', 'ctx', 'Value prop: saves time');
+  addLink('adv-svc-transition', 'adv-breakaway', 'ctx', 'For: advisors going independent');
+  addLink('adv-svc-compliance', 'adv-trust', 'ctx', 'Value prop: trusted foundation');
+  addLink('adv-svc-marketing', 'adv-svc-client', 'ctx', 'Related: client management');
+  addLink('adv-svc-invest', 'adv-ecosystem', 'ctx', 'Value prop: connected ecosystem');
+  addLink('adv-svc-fin', 'adv-ecosystem', 'ctx', 'Value prop: connected ecosystem');
+  addLink('adv-svc-fin', 'cli-svc-fin', 'ctx', 'Client-facing equivalent: Financial Planning');
+
+  // ── ADVISOR RESOURCES ──
+  addLink('adv-resources', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('adv-resources', 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+  addLink('adv-resources', 'demo', 'cta', 'CTA: Request a demo');
+  addLink('adv-resources', 'adv-stories', 'ctx', 'Featured advisor stories');
+  addLink('adv-resources', 'adv-press', 'ctx', 'Section: Press');
+  addLink('adv-resources', 'adv-announce', 'ctx', 'Section: Announcements');
+  addLink('adv-resources', 'adv-events', 'ctx', 'Section: Events');
+  addLink('adv-resources', 'adv-shipped', 'ctx', 'Section: Savvy Shipped');
+
+  addLink('adv-stories', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('adv-stories', 'adv-landing', 'breadcrumb', 'Breadcrumb: For Advisors');
+  addLink('adv-stories', 'adv-resources', 'breadcrumb', 'Breadcrumb: Resources');
+  addLink('adv-stories', 'demo', 'cta', 'CTA: "Inspired? Talk to us"');
+  addLink('adv-stories', 'adv-solutions', 'ctx', 'Find your path: solutions overview');
+  addLink('adv-stories', 'adv-services', 'ctx', 'See what we offer');
+
+  // Anchor sections on resources page
+  ['adv-press','adv-announce','adv-events','adv-shipped'].forEach(id => {
+    addLink(id, 'adv-resources', 'breadcrumb', 'Parent: Resources for Advisors');
+  });
+
+  // ── FOR CLIENTS LANDING ──
+  addLink('cli-landing', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('cli-landing', 'directory', 'cta', 'Primary CTA: "Find an advisor"');
+  addLink('cli-landing', 'adv-landing', 'cta', 'Cross-audience CTA: "Are you a financial advisor?"');
+  addLink('cli-landing', 'our-story', 'ctx', 'Our Story section / Ritik founder story');
+  addLink('cli-landing', 'cli-families', 'ctx', 'Who we work with: Families');
+  addLink('cli-landing', 'cli-preretirees', 'ctx', 'Who we work with: Pre-Retirees');
+  addLink('cli-landing', 'cli-seniors', 'ctx', 'Who we work with: Senior Professionals');
+  addLink('cli-landing', 'cli-biz', 'ctx', 'Who we work with: Business Owners');
+  addLink('cli-landing', 'cli-uhnw', 'ctx', 'Who we work with: UHNW');
+  addLink('cli-landing', 'cli-svc-tax', 'ctx', 'Services highlight: Tax Optimization');
+  addLink('cli-landing', 'cli-svc-fin', 'ctx', 'Services highlight: Financial Planning');
+  addLink('cli-landing', 'cli-svc-alts', 'ctx', 'Services highlight: Alternative Investments');
+  addLink('cli-landing', 'cli-services', 'cta', '"Explore all services →"');
+
+  // ── CLIENT SEGMENTS ──
+  const segmentIds = ['cli-families','cli-preretirees','cli-seniors','cli-biz','cli-uhnw'];
+  segmentIds.forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'cli-landing', 'breadcrumb', 'Breadcrumb: For Clients');
+    addLink(id, 'directory', 'cta', 'Primary CTA: "Find an advisor"');
+    addLink(id, 'cli-services', 'ctx', '"See our full range of services"');
+    // Cross-link to related services
+    addLink(id, 'cli-svc-fin', 'ctx', 'Related: Financial Planning');
+    segmentIds.filter(s => s !== id).forEach(sib => {
+      addLink(id, sib, 'ctx', 'Cross-link: other client segments');
+    });
+  });
+  // Specific segment → service links
+  addLink('cli-families', 'cli-svc-edu', 'ctx', 'Related: Education Planning');
+  addLink('cli-families', 'cli-svc-trust', 'ctx', 'Related: Trust & Estate');
+  addLink('cli-preretirees', 'cli-svc-retire', 'ctx', 'Related: Retirement Planning');
+  addLink('cli-preretirees', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
+  addLink('cli-seniors', 'cli-svc-invest', 'ctx', 'Related: Investment Management');
+  addLink('cli-seniors', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
+  addLink('cli-biz', 'cli-svc-biz', 'ctx', 'Related: Business Succession Planning');
+  addLink('cli-biz', 'cli-svc-401k', 'ctx', 'Related: 401(K) for Business');
+  addLink('cli-uhnw', 'cli-svc-alts', 'ctx', 'Related: Alternative Investments');
+  addLink('cli-uhnw', 'cli-svc-trust', 'ctx', 'Related: Trust & Estate');
+  addLink('cli-uhnw', 'cli-svc-direct', 'ctx', 'Related: Direct Indexing');
+
+  // ── DIRECTORY ──
+  addLink('directory', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('directory', 'cli-landing', 'ctx', 'Context: learn more about Savvy');
+  addLink('directory', 'cli-services', 'ctx', '"What services do our advisors offer?"');
+  addLink('directory', 'about', 'ctx', 'Learn more about our platform');
+
+  addLink('advisor-page', 'directory', 'breadcrumb', 'Breadcrumb: Find an Advisor');
+  addLink('advisor-page', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('advisor-page', 'cli-services', 'ctx', 'Link to services this advisor offers');
+  addLink('advisor-page', 'cli-landing', 'ctx', '"Learn more about the Savvy experience"');
+
+  // ── CLIENT SERVICES ──
+  addLink('cli-services', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('cli-services', 'directory', 'cta', 'CTA: "Find an advisor"');
+  const cliSvcIds = ['cli-svc-invest','cli-svc-tax','cli-svc-direct','cli-svc-retire','cli-svc-trust','cli-svc-risk','cli-svc-biz','cli-svc-edu','cli-svc-fin','cli-svc-alts','cli-svc-401k','cli-svc-pg'];
+  cliSvcIds.forEach(id => {
+    addLink('cli-services', id, 'ctx', 'Service card link');
+  });
+
+  cliSvcIds.forEach(id => {
+    addLink(id, 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+    addLink(id, 'cli-services', 'breadcrumb', 'Breadcrumb: Our Services');
+    addLink(id, 'directory', 'cta', 'CTA: "Find an advisor who specializes in this"');
+    // 2-3 related service cross-links
+    cliSvcIds.filter(s => s !== id).slice(0, 3).forEach(sib => {
+      addLink(id, sib, 'ctx', 'Related service');
+    });
+  });
+  // Specific service cross-links
+  addLink('cli-svc-tax', 'cli-svc-direct', 'ctx', 'Related: Direct Indexing (tax-loss harvesting)');
+  addLink('cli-svc-retire', 'cli-svc-fin', 'ctx', 'Related: Financial Planning');
+  addLink('cli-svc-trust', 'cli-svc-risk', 'ctx', 'Related: Risk Management');
+  addLink('cli-svc-biz', 'cli-svc-401k', 'ctx', 'Related: 401(K) for Business');
+  addLink('cli-svc-pg', 'cli-svc-invest', 'ctx', 'Related: Investment Management');
+  addLink('cli-svc-pg', 'cli-svc-tax', 'ctx', 'Related: Tax Optimization');
+
+  // ── CLIENT RESOURCES ──
+  addLink('cli-resources', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('cli-resources', 'directory', 'cta', 'CTA: "Find an advisor"');
+  addLink('cli-resources', 'cli-blog', 'ctx', 'Section: Blog');
+  addLink('cli-resources', 'cli-press', 'ctx', 'Section: Press');
+  addLink('cli-resources', 'cli-insights', 'ctx', 'Section: Insights');
+  addLink('cli-resources', 'cli-events', 'ctx', 'Section: Events');
+
+  addLink('cli-blog', 'cli-resources', 'breadcrumb', 'Breadcrumb: Resources');
+  addLink('cli-blog', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('cli-blog', 'directory', 'cta', 'CTA: Find an advisor');
+
+  addLink('cli-blog-post', 'cli-blog', 'breadcrumb', 'Breadcrumb: Blog');
+  addLink('cli-blog-post', 'cli-resources', 'breadcrumb', 'Breadcrumb: Resources');
+  addLink('cli-blog-post', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('cli-blog-post', 'directory', 'cta', 'CTA: Find an advisor');
+  addLink('cli-blog-post', 'cli-services', 'ctx', 'Contextual: related services');
+  addLink('cli-blog-post', 'adv-landing', 'ctx', 'Cross-audience: "Are you an advisor?"');
+
+  ['cli-press','cli-insights','cli-events'].forEach(id => {
+    addLink(id, 'cli-resources', 'breadcrumb', 'Parent: Resources');
+  });
+
+  // ── ABOUT PAGES ──
+  addLink('about', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('about', 'our-story', 'ctx', 'Learn our story');
+  addLink('about', 'careers', 'ctx', 'Join the team');
+  addLink('about', 'faq', 'ctx', 'Common questions');
+  addLink('about', 'adv-landing', 'ctx', 'For advisors');
+  addLink('about', 'cli-landing', 'ctx', 'For clients');
+  addLink('about', 'demo', 'cta', 'CTA: Request a demo');
+
+  addLink('our-story', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('our-story', 'about', 'breadcrumb', 'Breadcrumb: About');
+  addLink('our-story', 'adv-landing', 'ctx', '"For advisors" — see how we partner');
+  addLink('our-story', 'cli-landing', 'ctx', '"For clients" — see the experience');
+  addLink('our-story', 'careers', 'ctx', '"Join us"');
+  addLink('our-story', 'demo', 'cta', 'CTA: Request a demo');
+
+  addLink('careers', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('careers', 'about', 'breadcrumb', 'Breadcrumb: About');
+  addLink('careers', 'our-story', 'ctx', 'Our story / mission');
+
+  addLink('faq', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('faq', 'about', 'breadcrumb', 'Breadcrumb: About');
+  addLink('faq', 'demo', 'cta', 'CTA: Still have questions? Talk to us');
+  addLink('faq', 'directory', 'cta', 'CTA: Find an advisor');
+  addLink('faq', 'adv-landing', 'ctx', 'FAQ links to advisor-relevant answers');
+  addLink('faq', 'cli-landing', 'ctx', 'FAQ links to client-relevant answers');
+  addLink('faq', 'cli-services', 'ctx', 'FAQ links to services for detailed answers');
+
+  // ── DEMO ──
+  addLink('demo', 'homepage', 'breadcrumb', 'Breadcrumb: Home');
+  addLink('demo', 'adv-landing', 'ctx', 'Back to: For Advisors');
+  addLink('demo', 'faq', 'ctx', 'Have questions? See our FAQ');
+
+  return links;
+}
+
+
+// ── PAGE ASSEMBLY ──────────────────────────────────────────────────
+
+function getAllPages(option) {
+  let pages = [];
+
+  if (option === 'A') {
+    // Client-facing homepage
+    pages.push({ id:'homepage', name:'Homepage (Client-Facing)', slug:'/', section:'Homepage', isChild:false });
+    pages = pages.concat(clientPages('')); // client at root
+    pages = pages.concat(advisorPages('')); // advisors at /advisors
+  } else {
+    // Advisor-facing homepage
+    pages.push({ id:'homepage', name:'Homepage (Advisor-Facing)', slug:'/', section:'Homepage', isChild:false });
+    pages = pages.concat(advisorPages('')); // advisors at /advisors (root-level hub)
+    pages = pages.concat(clientPages('/clients')); // clients at /clients
+  }
+  pages = pages.concat(sharedPages);
+  return pages;
+}
+
+
+// ── RENDERING ──────────────────────────────────────────────────────
+
+function renderSitemap(option) {
+  const pages = getAllPages(option);
+  const container = document.getElementById(`sitemap-${option}`);
+  const links = buildLinks(option);
+
+  // Count inbound links per page
+  const inbound = {};
+  Object.values(links).forEach(arr => arr.forEach(l => {
+    inbound[l.to] = (inbound[l.to] || 0) + 1;
+  }));
+
+  // Group by section
+  const sections = {};
+  pages.forEach(p => {
+    if (!sections[p.section]) sections[p.section] = [];
+    sections[p.section].push(p);
+  });
+
+  let html = '';
+  Object.entries(sections).forEach(([section, sPages]) => {
+    html += `<div class="sitemap-section" data-section="${section}">`;
+    html += `<div class="sitemap-section-title">${section}</div>`;
+    sPages.forEach(p => {
+      const ib = inbound[p.id] || 0;
+      html += `<div class="sitemap-page ${p.isChild ? 'child' : ''}" data-id="${p.id}" data-name="${p.name.toLowerCase()}" onclick="selectPage('${option}','${p.id}')">
+        ${p.name}<span class="inbound-count" title="${ib} inbound links">${ib}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  container.innerHTML = html;
+
+  // Stats
+  const totalPages = pages.length;
+  let totalLinks = 0;
+  Object.values(links).forEach(arr => totalLinks += arr.length);
+  const typeCounts = { nav:0, ctx:0, cta:0, footer:0, breadcrumb:0 };
+  Object.values(links).forEach(arr => arr.forEach(l => typeCounts[l.type]++));
+
+  document.getElementById(`stats-${option}`).innerHTML = `
+    <div class="stat"><div class="stat-val">${totalPages}</div><div class="stat-label">Total pages</div></div>
+    <div class="stat"><div class="stat-val">${totalLinks}</div><div class="stat-label">Total link relationships</div></div>
+    <div class="stat"><div class="stat-val">${typeCounts.nav}</div><div class="stat-label">Navigation links</div></div>
+    <div class="stat"><div class="stat-val">${typeCounts.ctx}</div><div class="stat-label">Contextual links</div></div>
+    <div class="stat"><div class="stat-val">${typeCounts.cta}</div><div class="stat-label">CTA links</div></div>
+  `;
+}
+
+function selectPage(option, pageId) {
+  const pages = getAllPages(option);
+  const page = pages.find(p => p.id === pageId);
+  if (!page) return;
+
+  // Highlight in sitemap
+  document.querySelectorAll(`#sitemap-${option} .sitemap-page`).forEach(el => el.classList.remove('active'));
+  const el = document.querySelector(`#sitemap-${option} .sitemap-page[data-id="${pageId}"]`);
+  if (el) el.classList.add('active');
+
+  const links = buildLinks(option);
+  const pageLinks = links[pageId] || [];
+
+  // Also find inbound links
+  const inboundLinks = [];
+  Object.entries(links).forEach(([fromId, arr]) => {
+    arr.forEach(l => {
+      if (l.to === pageId) {
+        const fromPage = pages.find(p => p.id === fromId);
+        if (fromPage) inboundLinks.push({ from: fromPage, type: l.type, reason: l.reason });
+      }
+    });
+  });
+
+  // Group outgoing by type
+  const typeOrder = ['nav','ctx','cta','footer','breadcrumb'];
+  const typeLabels = { nav:'Navigation Links', ctx:'Contextual (In-Content) Links', cta:'CTA Links', footer:'Footer Links', breadcrumb:'Breadcrumb Links' };
+  const typeColors = { nav:'var(--nav)', ctx:'var(--ctx)', cta:'var(--cta)', footer:'var(--footer)', breadcrumb:'var(--breadcrumb)' };
+
+  let html = `<h2>${page.name}</h2><div class="detail-slug">${page.slug}</div>`;
+
+  // Outgoing
+  html += `<h3 style="font-size:15px; margin-bottom:16px;">Outgoing Links (${pageLinks.length})</h3>`;
+  typeOrder.forEach(type => {
+    const typeLinks = pageLinks.filter(l => l.type === type);
+    if (typeLinks.length === 0) return;
+    html += `<div class="detail-section">`;
+    html += `<h4><span class="dot" style="background:${typeColors[type]}"></span>${typeLabels[type]} (${typeLinks.length})</h4>`;
+    html += `<ul class="link-list">`;
+    typeLinks.forEach(l => {
+      const target = pages.find(p => p.id === l.to);
+      if (!target) return;
+      html += `<li onclick="selectPage('${option}','${l.to}')">
+        <span>${target.name} <span class="link-slug">${target.slug}</span></span>
+        <span class="link-reason">${l.reason}</span>
+      </li>`;
+    });
+    html += `</ul></div>`;
+  });
+
+  // Inbound
+  html += `<h3 style="font-size:15px; margin: 24px 0 16px; padding-top: 20px; border-top: 1px solid var(--border);">Inbound Links (${inboundLinks.length})</h3>`;
+  typeOrder.forEach(type => {
+    const typeLinks = inboundLinks.filter(l => l.type === type);
+    if (typeLinks.length === 0) return;
+    html += `<div class="detail-section">`;
+    html += `<h4><span class="dot" style="background:${typeColors[type]}"></span>${typeLabels[type]} (${typeLinks.length})</h4>`;
+    html += `<ul class="link-list">`;
+    typeLinks.forEach(l => {
+      html += `<li onclick="selectPage('${option}','${l.from.id}')">
+        <span>${l.from.name} <span class="link-slug">${l.from.slug}</span></span>
+        <span class="link-reason">${l.reason}</span>
+      </li>`;
+    });
+    html += `</ul></div>`;
+  });
+
+  document.getElementById(`detail-${option}`).innerHTML = html;
+}
+
+function filterPages(option, query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll(`#sitemap-${option} .sitemap-page`).forEach(el => {
+    const name = el.dataset.name;
+    el.style.display = name.includes(q) ? '' : 'none';
+  });
+  // Show/hide sections
+  document.querySelectorAll(`#sitemap-${option} .sitemap-section`).forEach(sec => {
+    const visible = sec.querySelectorAll('.sitemap-page:not([style*="display: none"])');
+    sec.style.display = visible.length > 0 ? '' : 'none';
+  });
+}
+
+function switchTab(option) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.option-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab')[option === 'A' ? 0 : 1].classList.add('active');
+  document.getElementById(`panel-${option}`).classList.add('active');
+}
+
+// Init
+renderSitemap('A');
+renderSitemap('B');
+</script>
+</body>
+</html>
